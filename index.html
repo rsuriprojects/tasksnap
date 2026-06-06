@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>tasksnap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --green: #1D9E75;
+    --green-dark: #0F6E56;
+    --green-light: #E1F5EE;
+    --bg: #f2f2f4;
+    --surface: #ffffff;
+    --surface2: #f7f7f9;
+    --text: #1a1a1a;
+    --text2: #6e6e73;
+    --border: rgba(0,0,0,0.08);
+    --border2: rgba(0,0,0,0.14);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --radius-pill: 99px;
+    --font: 'DM Sans', -apple-system, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111113;
+      --surface: #1c1c1e;
+      --surface2: #2c2c2e;
+      --text: #f0f0f2;
+      --text2: #8e8e93;
+      --border: rgba(255,255,255,0.08);
+      --border2: rgba(255,255,255,0.14);
+      --green-light: rgba(29,158,117,0.15);
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: var(--font); background: var(--bg); min-height: 100vh; display: flex; justify-content: center; }
+  .phone { width: 100%; max-width: 430px; min-height: 100vh; background: var(--bg); padding-bottom: 100px; }
+
+  /* topbar */
+  .topbar { background: var(--surface); border-bottom: 0.5px solid var(--border); padding: 56px 20px 14px; position: sticky; top: 0; z-index: 10; }
+  .topbar-inner { display: flex; align-items: flex-end; justify-content: space-between; }
+  .brand { font-size: 26px; font-weight: 600; color: var(--text); letter-spacing: -0.5px; }
+  .brand span { color: var(--green); }
+  .date-str { font-size: 13px; color: var(--text2); margin-top: 2px; }
+
+  /* progress */
+  .progress-wrap { padding: 14px 20px 0; }
+  .progress-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .progress-count { font-size: 13px; color: var(--text2); }
+  .progress-pct { font-size: 13px; font-weight: 500; color: var(--green); }
+  .bar-bg { height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .bar-fill { height: 5px; background: var(--green); border-radius: 99px; transition: width 0.35s ease; }
+
+  /* day tabs */
+  .day-tabs-wrap { padding: 14px 20px 0; overflow-x: auto; scrollbar-width: none; }
+  .day-tabs-wrap::-webkit-scrollbar { display: none; }
+  .day-tabs { display: flex; gap: 6px; }
+  .day-tab { flex-shrink: 0; padding: 6px 14px; border-radius: var(--radius-pill); border: 0.5px solid var(--border2); font-size: 13px; font-family: var(--font); cursor: pointer; color: var(--text2); background: var(--surface); transition: all 0.15s; }
+  .day-tab.active { background: var(--green); color: white; border-color: var(--green); font-weight: 500; }
+  .day-tab.is-today:not(.active) { border-color: var(--green); color: var(--green); }
+
+  /* section */
+  .section { padding: 20px 20px 0; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text2); margin-bottom: 10px; }
+
+  /* task cards */
+  .task-item { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 13px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 8px; cursor: pointer; transition: background 0.12s; user-select: none; }
+  .task-item:active { background: var(--surface2); transform: scale(0.99); }
+  .task-item.done { opacity: 0.6; }
+  .task-item.done .task-name { text-decoration: line-through; }
+  .check { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--border2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+  .task-item.done .check { background: var(--green); border-color: var(--green); }
+  .check-icon { width: 12px; height: 12px; stroke: white; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: none; opacity: 0; transition: opacity 0.15s; }
+  .task-item.done .check-icon { opacity: 1; }
+  .task-name { font-size: 15px; color: var(--text); flex: 1; }
+  .task-tag { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: var(--radius-pill); flex-shrink: 0; }
+  .tag-work { background: #EBF3FE; color: #1A56B0; }
+  .tag-personal { background: var(--green-light); color: var(--green-dark); }
+  .tag-health { background: #FEF3E2; color: #92540A; }
+  @media (prefers-color-scheme: dark) {
+    .tag-work { background: rgba(56,131,220,0.2); color: #7BB3F0; }
+    .tag-personal { background: rgba(29,158,117,0.2); color: #4ECBA4; }
+    .tag-health { background: rgba(239,159,39,0.2); color: #F0B84A; }
+  }
+  .task-delete { background: none; border: none; color: var(--text2); cursor: pointer; padding: 2px; font-size: 16px; opacity: 0; transition: opacity 0.15s; line-height: 1; }
+  .task-item:hover .task-delete { opacity: 1; }
+  .empty { text-align: center; padding: 1.5rem; color: var(--text2); font-size: 14px; }
+
+  /* add task */
+  .add-wrap { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: var(--surface); border-top: 0.5px solid var(--border); padding: 12px 16px 28px; }
+  .add-input { width: 100%; font-family: var(--font); font-size: 15px; padding: 11px 14px; border-radius: var(--radius-sm); border: 0.5px solid var(--border2); background: var(--surface2); color: var(--text); outline: none; margin-bottom: 8px; }
+  .add-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(29,158,117,0.12); }
+  .add-controls { display: flex; gap: 8px; }
+  .add-select { flex: 1; font-family: var(--font); font-size: 13px; padding: 8px 10px; border-radius: var(--radius-sm); border: 0.5px solid var(--border2); background: var(--surface2); color: var(--text); cursor: pointer; outline: none; min-width: 0; }
+  .add-btn { background: var(--green); color: white; border: none; border-radius: var(--radius-sm); padding: 8px 18px; font-family: var(--font); font-size: 14px; font-weight: 500; cursor: pointer; flex-shrink: 0; transition: background 0.15s; }
+  .add-btn:hover { background: var(--green-dark); }
+  .add-btn:active { transform: scale(0.97); }
+
+  /* all done banner */
+  .all-done { background: var(--green-light); border: 0.5px solid rgba(29,158,117,0.25); border-radius: var(--radius); padding: 14px 16px; margin: 0 20px; display: flex; align-items: center; gap: 10px; }
+  .all-done-text { font-size: 15px; font-weight: 500; color: var(--green-dark); }
+  @media (prefers-color-scheme: dark) { .all-done-text { color: #4ECBA4; } }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div>
+        <div class="brand">task<span>snap</span></div>
+        <div class="date-str" id="dateStr"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-row">
+      <span class="progress-count" id="progressCount">0 of 0 done</span>
+      <span class="progress-pct" id="progressPct">0%</span>
+    </div>
+    <div class="bar-bg"><div class="bar-fill" id="barFill" style="width:0%"></div></div>
+  </div>
+
+  <div class="day-tabs-wrap"><div class="day-tabs" id="dayTabs"></div></div>
+
+  <div id="mainContent"></div>
+</div>
+
+<div class="add-wrap">
+  <input class="add-input" id="addInput" placeholder="add a task…" />
+  <div class="add-controls">
+    <select class="add-select" id="tagSelect">
+      <option value="work">💼 work</option>
+      <option value="personal">🌿 personal</option>
+      <option value="health">🏃 health</option>
+    </select>
+    <select class="add-select" id="repeatSelect">
+      <option value="once">today only</option>
+      <option value="weekdays">every weekday</option>
+      <option value="weekends">every weekend</option>
+      <option value="daily">every day</option>
+    </select>
+    <button class="add-btn" id="addBtn">add</button>
+  </div>
+</div>
+
+<script>
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const todayIdx = new Date().getDay();
+
+let state = JSON.parse(localStorage.getItem('tasksnap_state') || 'null') || {
+  activeDay: todayIdx,
+  tasks: [],
+  nextId: 1
+};
+
+function save() { localStorage.setItem('tasksnap_state', JSON.stringify(state)); }
+
+function isWeekday(d) { return d >= 1 && d <= 5; }
+function isWeekend(d) { return d === 0 || d === 6; }
+
+function taskVisible(task, day) {
+  if (task.repeat === 'daily') return true;
+  if (task.repeat === 'weekdays') return isWeekday(day);
+  if (task.repeat === 'weekends') return isWeekend(day);
+  if (task.repeat === 'once') return task.day === day;
+  return false;
+}
+
+function toggleTask(id) {
+  const t = state.tasks.find(t => t.id === id);
+  if (t) { t.done[state.activeDay] = !t.done[state.activeDay]; save(); render(); }
+}
+
+function deleteTask(id, e) {
+  e.stopPropagation();
+  state.tasks = state.tasks.filter(t => t.id !== id);
+  save(); render();
+}
+
+function addTask() {
+  const input = document.getElementById('addInput');
+  const name = input.value.trim();
+  if (!name) return;
+  const tag = document.getElementById('tagSelect').value;
+  const repeat = document.getElementById('repeatSelect').value;
+  state.tasks.push({ id: state.nextId++, name, tag, repeat, day: state.activeDay, done: {} });
+  input.value = '';
+  save(); render();
+}
+
+document.getElementById('addBtn').addEventListener('click', addTask);
+document.getElementById('addInput').addEventListener('keydown', e => { if (e.key === 'Enter') addTask(); });
+
+function makeTaskEl(task) {
+  const d = state.activeDay;
+  const isDone = !!task.done[d];
+  const el = document.createElement('div');
+  el.className = 'task-item' + (isDone ? ' done' : '');
+  el.innerHTML = `
+    <div class="check">
+      <svg class="check-icon" viewBox="0 0 12 12"><polyline points="1.5,6 4.5,9.5 10.5,2.5"/></svg>
+    </div>
+    <span class="task-name">${task.name}</span>
+    <span class="task-tag tag-${task.tag}">${task.tag}</span>
+    <button class="task-delete" aria-label="delete task">✕</button>
+  `;
+  el.addEventListener('click', () => toggleTask(task.id));
+  el.querySelector('.task-delete').addEventListener('click', e => deleteTask(task.id, e));
+  return el;
+}
+
+function render() {
+  const d = state.activeDay;
+  const now = new Date();
+  const showDate = new Date(now);
+  showDate.setDate(now.getDate() + (d - now.getDay()));
+  document.getElementById('dateStr').textContent = showDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+  // tabs
+  const tabs = document.getElementById('dayTabs');
+  tabs.innerHTML = '';
+  DAYS.forEach((day, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'day-tab' + (i === d ? ' active' : '') + (i === todayIdx && i !== d ? ' is-today' : '');
+    btn.textContent = day;
+    btn.addEventListener('click', () => { state.activeDay = i; save(); render(); });
+    tabs.appendChild(btn);
+  });
+
+  // tasks
+  const visible = state.tasks.filter(t => taskVisible(t, d));
+  const recurring = visible.filter(t => t.repeat !== 'once');
+  const once = visible.filter(t => t.repeat === 'once');
+  const doneCount = visible.filter(t => t.done[d]).length;
+  const pct = visible.length ? Math.round(doneCount / visible.length * 100) : 0;
+
+  document.getElementById('progressCount').textContent = `${doneCount} of ${visible.length} done`;
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('barFill').style.width = pct + '%';
+
+  const content = document.getElementById('mainContent');
+  content.innerHTML = '';
+
+  if (visible.length > 0 && doneCount === visible.length) {
+    const banner = document.createElement('div');
+    banner.className = 'all-done';
+    banner.innerHTML = `<span style="font-size:20px">🎉</span><span class="all-done-text">all done for ${DAYS[d]}!</span>`;
+    content.appendChild(banner);
+  }
+
+  function renderSection(tasks, label) {
+    if (!tasks.length) return;
+    const sec = document.createElement('div');
+    sec.className = 'section';
+    sec.innerHTML = `<div class="section-label">${label}</div>`;
+    tasks.forEach(t => sec.appendChild(makeTaskEl(t)));
+    content.appendChild(sec);
+  }
+
+  renderSection(recurring, 'recurring');
+  renderSection(once, 'today only');
+
+  if (!visible.length) {
+    const sec = document.createElement('div');
+    sec.className = 'section';
+    sec.innerHTML = `<div class="empty">no tasks for ${DAYS[d]} — add one below</div>`;
+    content.appendChild(sec);
+  }
+}
+
+render();
+</script>
+</body>
+</html>
