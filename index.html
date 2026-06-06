@@ -148,8 +148,10 @@
 </div>
 
 <script>
-const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-const todayIdx = new Date().getDay();
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+// JS getDay(): 0=Sun,1=Mon...6=Sat. Remap to Mon=0...Sun=6
+const jsDay = new Date().getDay();
+const todayIdx = jsDay === 0 ? 6 : jsDay - 1;
 
 let state = JSON.parse(localStorage.getItem('tasksnap_state') || 'null') || {
   activeDay: todayIdx,
@@ -159,8 +161,9 @@ let state = JSON.parse(localStorage.getItem('tasksnap_state') || 'null') || {
 
 function save() { localStorage.setItem('tasksnap_state', JSON.stringify(state)); }
 
-function isWeekday(d) { return d >= 1 && d <= 5; }
-function isWeekend(d) { return d === 0 || d === 6; }
+// In our scheme: Mon=0,Tue=1,Wed=2,Thu=3,Fri=4,Sat=5,Sun=6
+function isWeekday(d) { return d >= 0 && d <= 4; }
+function isWeekend(d) { return d === 5 || d === 6; }
 
 function taskVisible(task, day) {
   if (task.repeat === 'daily') return true;
@@ -217,7 +220,9 @@ function render() {
   const d = state.activeDay;
   const now = new Date();
   const showDate = new Date(now);
-  showDate.setDate(now.getDate() + (d - now.getDay()));
+  const jsTarget = d === 6 ? 0 : d + 1;
+  const jsNow = now.getDay();
+  showDate.setDate(now.getDate() + (jsTarget - jsNow));
   document.getElementById('dateStr').textContent = showDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
   // tabs
