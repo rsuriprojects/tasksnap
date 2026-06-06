@@ -37,7 +37,7 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body { font-family: var(--font); background: var(--bg); min-height: 100vh; display: flex; justify-content: center; }
-  .phone { width: 100%; max-width: 430px; min-height: 100vh; background: var(--bg); padding-bottom: 100px; }
+  .phone { width: 100%; max-width: 430px; min-height: 100vh; background: var(--bg); padding-bottom: 120px; }
 
   /* topbar */
   .topbar { background: var(--surface); border-bottom: 0.5px solid var(--border); padding: 56px 20px 14px; position: sticky; top: 0; z-index: 10; }
@@ -69,7 +69,7 @@
   /* task cards */
   .task-item { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 13px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 8px; cursor: pointer; transition: background 0.12s; user-select: none; }
   .task-item:active { background: var(--surface2); transform: scale(0.99); }
-  .task-item.done { opacity: 0.6; }
+  .task-item.done { opacity: 0.5; }
   .task-item.done .task-name { text-decoration: line-through; }
   .check { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--border2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
   .task-item.done .check { background: var(--green); border-color: var(--green); }
@@ -89,12 +89,18 @@
   .task-item:hover .task-delete { opacity: 1; }
   .empty { text-align: center; padding: 1.5rem; color: var(--text2); font-size: 14px; }
 
+  /* priority dot */
+  .priority-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .p-high  { background: #E24B4A; }
+  .p-medium { background: #EF9F27; }
+  .p-low   { background: #B4B2A9; }
+
   /* add task */
   .add-wrap { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: var(--surface); border-top: 0.5px solid var(--border); padding: 12px 16px 28px; }
   .add-input { width: 100%; font-family: var(--font); font-size: 15px; padding: 11px 14px; border-radius: var(--radius-sm); border: 0.5px solid var(--border2); background: var(--surface2); color: var(--text); outline: none; margin-bottom: 8px; }
   .add-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(29,158,117,0.12); }
-  .add-controls { display: flex; gap: 8px; }
-  .add-select { flex: 1; font-family: var(--font); font-size: 13px; padding: 8px 10px; border-radius: var(--radius-sm); border: 0.5px solid var(--border2); background: var(--surface2); color: var(--text); cursor: pointer; outline: none; min-width: 0; }
+  .add-controls { display: flex; gap: 6px; }
+  .add-select { flex: 1; font-family: var(--font); font-size: 13px; padding: 8px 6px; border-radius: var(--radius-sm); border: 0.5px solid var(--border2); background: var(--surface2); color: var(--text); cursor: pointer; outline: none; min-width: 0; }
   .add-btn { background: var(--green); color: white; border: none; border-radius: var(--radius-sm); padding: 8px 18px; font-family: var(--font); font-size: 14px; font-weight: 500; cursor: pointer; flex-shrink: 0; transition: background 0.15s; }
   .add-btn:hover { background: var(--green-dark); }
   .add-btn:active { transform: scale(0.97); }
@@ -143,15 +149,21 @@
       <option value="weekends">every weekend</option>
       <option value="daily">every day</option>
     </select>
+    <select class="add-select" id="prioritySelect">
+      <option value="medium">● medium</option>
+      <option value="high">🔴 high</option>
+      <option value="low">⚪ low</option>
+    </select>
     <button class="add-btn" id="addBtn">add</button>
   </div>
 </div>
 
 <script>
 const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-// JS getDay(): 0=Sun,1=Mon...6=Sat. Remap to Mon=0...Sun=6
 const jsDay = new Date().getDay();
 const todayIdx = jsDay === 0 ? 6 : jsDay - 1;
+
+const PRIORITY_ORDER = { high: 0, medium: 1, low: 2 };
 
 let state = JSON.parse(localStorage.getItem('tasksnap_state') || 'null') || {
   activeDay: todayIdx,
@@ -161,7 +173,6 @@ let state = JSON.parse(localStorage.getItem('tasksnap_state') || 'null') || {
 
 function save() { localStorage.setItem('tasksnap_state', JSON.stringify(state)); }
 
-// In our scheme: Mon=0,Tue=1,Wed=2,Thu=3,Fri=4,Sat=5,Sun=6
 function isWeekday(d) { return d >= 0 && d <= 4; }
 function isWeekend(d) { return d === 5 || d === 6; }
 
@@ -190,7 +201,8 @@ function addTask() {
   if (!name) return;
   const tag = document.getElementById('tagSelect').value;
   const repeat = document.getElementById('repeatSelect').value;
-  state.tasks.push({ id: state.nextId++, name, tag, repeat, day: state.activeDay, done: {} });
+  const priority = document.getElementById('prioritySelect').value;
+  state.tasks.push({ id: state.nextId++, name, tag, repeat, priority, day: state.activeDay, done: {} });
   input.value = '';
   save(); render();
 }
@@ -201,9 +213,11 @@ document.getElementById('addInput').addEventListener('keydown', e => { if (e.key
 function makeTaskEl(task) {
   const d = state.activeDay;
   const isDone = !!task.done[d];
+  const priority = task.priority || 'medium';
   const el = document.createElement('div');
   el.className = 'task-item' + (isDone ? ' done' : '');
   el.innerHTML = `
+    <div class="priority-dot p-${priority}"></div>
     <div class="check">
       <svg class="check-icon" viewBox="0 0 12 12"><polyline points="1.5,6 4.5,9.5 10.5,2.5"/></svg>
     </div>
@@ -216,6 +230,14 @@ function makeTaskEl(task) {
   return el;
 }
 
+function sortByPriority(tasks) {
+  return [...tasks].sort((a, b) => {
+    const pa = PRIORITY_ORDER[a.priority || 'medium'];
+    const pb = PRIORITY_ORDER[b.priority || 'medium'];
+    return pa - pb;
+  });
+}
+
 function render() {
   const d = state.activeDay;
   const now = new Date();
@@ -225,7 +247,6 @@ function render() {
   showDate.setDate(now.getDate() + (jsTarget - jsNow));
   document.getElementById('dateStr').textContent = showDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
-  // tabs
   const tabs = document.getElementById('dayTabs');
   tabs.innerHTML = '';
   DAYS.forEach((day, i) => {
@@ -236,10 +257,9 @@ function render() {
     tabs.appendChild(btn);
   });
 
-  // tasks
   const visible = state.tasks.filter(t => taskVisible(t, d));
-  const recurring = visible.filter(t => t.repeat !== 'once');
-  const once = visible.filter(t => t.repeat === 'once');
+  const recurring = sortByPriority(visible.filter(t => t.repeat !== 'once'));
+  const once = sortByPriority(visible.filter(t => t.repeat === 'once'));
   const doneCount = visible.filter(t => t.done[d]).length;
   const pct = visible.length ? Math.round(doneCount / visible.length * 100) : 0;
 
