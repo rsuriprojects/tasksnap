@@ -25,26 +25,27 @@
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #111113;
-      --surface: #1c1c1e;
-      --surface2: #2c2c2e;
-      --text: #f0f0f2;
-      --text2: #8e8e93;
-      --border: rgba(255,255,255,0.08);
-      --border2: rgba(255,255,255,0.14);
+      --bg: #111113; --surface: #1c1c1e; --surface2: #2c2c2e;
+      --text: #f0f0f2; --text2: #8e8e93;
+      --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.14);
       --green-light: rgba(29,158,117,0.15);
     }
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body { font-family: var(--font); background: var(--bg); min-height: 100vh; display: flex; justify-content: center; }
-  .phone { width: 100%; max-width: 430px; min-height: 100vh; background: var(--bg); padding-bottom: 120px; }
+  .phone { width: 100%; max-width: 430px; min-height: 100vh; background: var(--bg); padding-bottom: 140px; }
 
   /* topbar */
-  .topbar { background: var(--surface); border-bottom: 0.5px solid var(--border); padding: 56px 20px 14px; position: sticky; top: 0; z-index: 10; }
-  .topbar-inner { display: flex; align-items: flex-end; justify-content: space-between; }
+  .topbar { background: var(--surface); border-bottom: 0.5px solid var(--border); padding: 56px 20px 0; position: sticky; top: 0; z-index: 10; }
+  .topbar-inner { display: flex; align-items: flex-end; justify-content: space-between; padding-bottom: 10px; }
   .brand { font-size: 26px; font-weight: 600; color: var(--text); letter-spacing: -0.5px; }
   .brand span { color: var(--green); }
   .date-str { font-size: 13px; color: var(--text2); margin-top: 2px; }
+
+  /* view tabs */
+  .view-tabs { display: flex; border-top: 0.5px solid var(--border); }
+  .view-tab { flex: 1; padding: 10px; font-family: var(--font); font-size: 13px; font-weight: 500; background: none; border: none; cursor: pointer; color: var(--text2); border-bottom: 2px solid transparent; transition: all 0.15s; }
+  .view-tab.active { color: var(--green); border-bottom-color: var(--green); }
 
   /* progress */
   .progress-wrap { padding: 14px 20px 0; }
@@ -87,20 +88,32 @@
   }
   .task-delete { background: none; border: none; color: var(--text2); cursor: pointer; padding: 2px; font-size: 16px; opacity: 0; transition: opacity 0.15s; line-height: 1; }
   .task-item:hover .task-delete { opacity: 1; }
-  .empty { text-align: center; padding: 1.5rem; color: var(--text2); font-size: 14px; }
+  .empty { text-align: center; padding: 2rem; color: var(--text2); font-size: 14px; }
 
   /* priority dot */
-  .priority-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .p-high  { background: #E24B4A; }
+  .priority-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .p-high   { background: #E24B4A; }
   .p-medium { background: #EF9F27; }
-  .p-low   { background: #B4B2A9; }
+  .p-low    { background: #B4B2A9; }
 
-  /* add task */
+  /* time log entries */
+  .log-item { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 13px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+  .log-bar { width: 3px; border-radius: 99px; background: var(--green); align-self: stretch; flex-shrink: 0; }
+  .log-body { flex: 1; }
+  .log-activity { font-size: 15px; color: var(--text); font-weight: 500; }
+  .log-times { font-size: 13px; color: var(--text2); margin-top: 2px; }
+  .log-duration { font-size: 12px; font-weight: 500; color: var(--green); background: var(--green-light); padding: 2px 8px; border-radius: var(--radius-pill); flex-shrink: 0; }
+  .log-delete { background: none; border: none; color: var(--text2); cursor: pointer; font-size: 16px; opacity: 0; transition: opacity 0.15s; padding: 2px; }
+  .log-item:hover .log-delete { opacity: 1; }
+
+  /* add bar */
   .add-wrap { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: var(--surface); border-top: 0.5px solid var(--border); padding: 12px 16px 28px; }
   .add-input { width: 100%; font-family: var(--font); font-size: 15px; padding: 11px 14px; border-radius: var(--radius-sm); border: 0.5px solid var(--border2); background: var(--surface2); color: var(--text); outline: none; margin-bottom: 8px; }
   .add-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(29,158,117,0.12); }
-  .add-controls { display: flex; gap: 6px; }
+  .add-controls { display: flex; gap: 6px; flex-wrap: wrap; }
   .add-select { flex: 1; font-family: var(--font); font-size: 13px; padding: 8px 6px; border-radius: var(--radius-sm); border: 0.5px solid var(--border2); background: var(--surface2); color: var(--text); cursor: pointer; outline: none; min-width: 0; }
+  .add-time { flex: 1; font-family: var(--font); font-size: 13px; padding: 8px 6px; border-radius: var(--radius-sm); border: 0.5px solid var(--border2); background: var(--surface2); color: var(--text); outline: none; min-width: 0; }
+  .add-time:focus { border-color: var(--green); }
   .add-btn { background: var(--green); color: white; border: none; border-radius: var(--radius-sm); padding: 8px 18px; font-family: var(--font); font-size: 14px; font-weight: 500; cursor: pointer; flex-shrink: 0; transition: background 0.15s; }
   .add-btn:hover { background: var(--green-dark); }
   .add-btn:active { transform: scale(0.97); }
@@ -109,6 +122,8 @@
   .all-done { background: var(--green-light); border: 0.5px solid rgba(29,158,117,0.25); border-radius: var(--radius); padding: 14px 16px; margin: 0 20px; display: flex; align-items: center; gap: 10px; }
   .all-done-text { font-size: 15px; font-weight: 500; color: var(--green-dark); }
   @media (prefers-color-scheme: dark) { .all-done-text { color: #4ECBA4; } }
+
+  .hidden { display: none; }
 </style>
 </head>
 <body>
@@ -120,22 +135,32 @@
         <div class="date-str" id="dateStr"></div>
       </div>
     </div>
-  </div>
-
-  <div class="progress-wrap">
-    <div class="progress-row">
-      <span class="progress-count" id="progressCount">0 of 0 done</span>
-      <span class="progress-pct" id="progressPct">0%</span>
+    <div class="view-tabs">
+      <button class="view-tab active" id="tabTasks" onclick="switchView('tasks')">tasks</button>
+      <button class="view-tab" id="tabLog" onclick="switchView('log')">time log</button>
     </div>
-    <div class="bar-bg"><div class="bar-fill" id="barFill" style="width:0%"></div></div>
   </div>
 
-  <div class="day-tabs-wrap"><div class="day-tabs" id="dayTabs"></div></div>
+  <div id="viewTasks">
+    <div class="progress-wrap">
+      <div class="progress-row">
+        <span class="progress-count" id="progressCount">0 of 0 done</span>
+        <span class="progress-pct" id="progressPct">0%</span>
+      </div>
+      <div class="bar-bg"><div class="bar-fill" id="barFill" style="width:0%"></div></div>
+    </div>
+    <div class="day-tabs-wrap"><div class="day-tabs" id="dayTabs"></div></div>
+    <div id="mainContent"></div>
+  </div>
 
-  <div id="mainContent"></div>
+  <div id="viewLog" class="hidden">
+    <div class="day-tabs-wrap"><div class="day-tabs" id="dayTabsLog"></div></div>
+    <div id="logContent"></div>
+  </div>
 </div>
 
-<div class="add-wrap">
+<!-- task add bar -->
+<div class="add-wrap" id="addBarTask">
   <input class="add-input" id="addInput" placeholder="add a task…" />
   <div class="add-controls">
     <select class="add-select" id="tagSelect">
@@ -150,11 +175,21 @@
       <option value="daily">every day</option>
     </select>
     <select class="add-select" id="prioritySelect">
-      <option value="medium">● medium</option>
+      <option value="medium">🟠 medium</option>
       <option value="high">🔴 high</option>
-      <option value="low">⚪ low</option>
+      <option value="low">⚫ low</option>
     </select>
     <button class="add-btn" id="addBtn">add</button>
+  </div>
+</div>
+
+<!-- log add bar -->
+<div class="add-wrap hidden" id="addBarLog">
+  <input class="add-input" id="logActivityInput" placeholder="activity name…" />
+  <div class="add-controls">
+    <input class="add-time" type="time" id="logStart" />
+    <input class="add-time" type="time" id="logEnd" />
+    <button class="add-btn" id="addLogBtn">log</button>
   </div>
 </div>
 
@@ -162,14 +197,19 @@
 const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const jsDay = new Date().getDay();
 const todayIdx = jsDay === 0 ? 6 : jsDay - 1;
-
 const PRIORITY_ORDER = { high: 0, medium: 1, low: 2 };
 
 let state = JSON.parse(localStorage.getItem('tasksnap_state') || 'null') || {
   activeDay: todayIdx,
   tasks: [],
-  nextId: 1
+  logs: [],
+  nextId: 1,
+  nextLogId: 1
 };
+if (!state.logs) state.logs = [];
+if (!state.nextLogId) state.nextLogId = 1;
+
+let currentView = 'tasks';
 
 function save() { localStorage.setItem('tasksnap_state', JSON.stringify(state)); }
 
@@ -195,6 +235,12 @@ function deleteTask(id, e) {
   save(); render();
 }
 
+function deleteLog(id, e) {
+  e.stopPropagation();
+  state.logs = state.logs.filter(l => l.id !== id);
+  save(); renderLog();
+}
+
 function addTask() {
   const input = document.getElementById('addInput');
   const name = input.value.trim();
@@ -207,8 +253,63 @@ function addTask() {
   save(); render();
 }
 
+function addLog() {
+  const activity = document.getElementById('logActivityInput').value.trim();
+  const start = document.getElementById('logStart').value;
+  const end = document.getElementById('logEnd').value;
+  if (!activity || !start || !end) return;
+  state.logs.push({ id: state.nextLogId++, activity, start, end, day: state.activeDay });
+  document.getElementById('logActivityInput').value = '';
+  document.getElementById('logStart').value = '';
+  document.getElementById('logEnd').value = '';
+  save(); renderLog();
+}
+
+function formatTime(t) {
+  const [h, m] = t.split(':').map(Number);
+  const ampm = h >= 12 ? 'pm' : 'am';
+  const h12 = h % 12 || 12;
+  return `${h12}:${String(m).padStart(2,'0')}${ampm}`;
+}
+
+function calcDuration(start, end) {
+  const [sh, sm] = start.split(':').map(Number);
+  const [eh, em] = end.split(':').map(Number);
+  let mins = (eh * 60 + em) - (sh * 60 + sm);
+  if (mins <= 0) return null;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  if (h === 0) return `${m}m`;
+  if (m === 0) return `${h}h`;
+  return `${h}h ${m}m`;
+}
+
 document.getElementById('addBtn').addEventListener('click', addTask);
 document.getElementById('addInput').addEventListener('keydown', e => { if (e.key === 'Enter') addTask(); });
+document.getElementById('addLogBtn').addEventListener('click', addLog);
+
+function switchView(view) {
+  currentView = view;
+  document.getElementById('viewTasks').classList.toggle('hidden', view !== 'tasks');
+  document.getElementById('viewLog').classList.toggle('hidden', view !== 'log');
+  document.getElementById('addBarTask').classList.toggle('hidden', view !== 'tasks');
+  document.getElementById('addBarLog').classList.toggle('hidden', view !== 'log');
+  document.getElementById('tabTasks').classList.toggle('active', view === 'tasks');
+  document.getElementById('tabLog').classList.toggle('active', view === 'log');
+  if (view === 'log') renderLog();
+}
+
+function makeDayTabs(containerId) {
+  const tabs = document.getElementById(containerId);
+  tabs.innerHTML = '';
+  DAYS.forEach((day, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'day-tab' + (i === state.activeDay ? ' active' : '') + (i === todayIdx && i !== state.activeDay ? ' is-today' : '');
+    btn.textContent = day;
+    btn.addEventListener('click', () => { state.activeDay = i; save(); render(); if (currentView === 'log') renderLog(); });
+    tabs.appendChild(btn);
+  });
+}
 
 function makeTaskEl(task) {
   const d = state.activeDay;
@@ -218,12 +319,10 @@ function makeTaskEl(task) {
   el.className = 'task-item' + (isDone ? ' done' : '');
   el.innerHTML = `
     <div class="priority-dot p-${priority}"></div>
-    <div class="check">
-      <svg class="check-icon" viewBox="0 0 12 12"><polyline points="1.5,6 4.5,9.5 10.5,2.5"/></svg>
-    </div>
+    <div class="check"><svg class="check-icon" viewBox="0 0 12 12"><polyline points="1.5,6 4.5,9.5 10.5,2.5"/></svg></div>
     <span class="task-name">${task.name}</span>
     <span class="task-tag tag-${task.tag}">${task.tag}</span>
-    <button class="task-delete" aria-label="delete task">✕</button>
+    <button class="task-delete" aria-label="delete">✕</button>
   `;
   el.addEventListener('click', () => toggleTask(task.id));
   el.querySelector('.task-delete').addEventListener('click', e => deleteTask(task.id, e));
@@ -231,11 +330,60 @@ function makeTaskEl(task) {
 }
 
 function sortByPriority(tasks) {
-  return [...tasks].sort((a, b) => {
-    const pa = PRIORITY_ORDER[a.priority || 'medium'];
-    const pb = PRIORITY_ORDER[b.priority || 'medium'];
-    return pa - pb;
+  return [...tasks].sort((a, b) => (PRIORITY_ORDER[a.priority||'medium']) - (PRIORITY_ORDER[b.priority||'medium']));
+}
+
+function renderLog() {
+  makeDayTabs('dayTabsLog');
+  const d = state.activeDay;
+  const dayLogs = state.logs.filter(l => l.day === d).sort((a, b) => a.start.localeCompare(b.start));
+  const content = document.getElementById('logContent');
+  content.innerHTML = '';
+
+  if (!dayLogs.length) {
+    const sec = document.createElement('div');
+    sec.className = 'section';
+    sec.innerHTML = `<div class="empty">no time logs for ${DAYS[d]}<br><span style="font-size:13px">add an activity below</span></div>`;
+    content.appendChild(sec);
+    return;
+  }
+
+  // total time
+  let totalMins = 0;
+  dayLogs.forEach(l => {
+    const [sh, sm] = l.start.split(':').map(Number);
+    const [eh, em] = l.end.split(':').map(Number);
+    const diff = (eh * 60 + em) - (sh * 60 + sm);
+    if (diff > 0) totalMins += diff;
   });
+  const totalH = Math.floor(totalMins / 60);
+  const totalM = totalMins % 60;
+  const totalStr = totalH > 0 ? (totalM > 0 ? `${totalH}h ${totalM}m` : `${totalH}h`) : `${totalM}m`;
+
+  const header = document.createElement('div');
+  header.className = 'section';
+  header.innerHTML = `<div class="section-label">total logged: ${totalStr}</div>`;
+  content.appendChild(header);
+
+  const sec = document.createElement('div');
+  sec.className = 'section';
+  dayLogs.forEach(l => {
+    const dur = calcDuration(l.start, l.end);
+    const el = document.createElement('div');
+    el.className = 'log-item';
+    el.innerHTML = `
+      <div class="log-bar"></div>
+      <div class="log-body">
+        <div class="log-activity">${l.activity}</div>
+        <div class="log-times">${formatTime(l.start)} → ${formatTime(l.end)}</div>
+      </div>
+      ${dur ? `<div class="log-duration">${dur}</div>` : ''}
+      <button class="log-delete" aria-label="delete">✕</button>
+    `;
+    el.querySelector('.log-delete').addEventListener('click', e => deleteLog(l.id, e));
+    sec.appendChild(el);
+  });
+  content.appendChild(sec);
 }
 
 function render() {
@@ -243,19 +391,10 @@ function render() {
   const now = new Date();
   const showDate = new Date(now);
   const jsTarget = d === 6 ? 0 : d + 1;
-  const jsNow = now.getDay();
-  showDate.setDate(now.getDate() + (jsTarget - jsNow));
+  showDate.setDate(now.getDate() + (jsTarget - now.getDay()));
   document.getElementById('dateStr').textContent = showDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
-  const tabs = document.getElementById('dayTabs');
-  tabs.innerHTML = '';
-  DAYS.forEach((day, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'day-tab' + (i === d ? ' active' : '') + (i === todayIdx && i !== d ? ' is-today' : '');
-    btn.textContent = day;
-    btn.addEventListener('click', () => { state.activeDay = i; save(); render(); });
-    tabs.appendChild(btn);
-  });
+  makeDayTabs('dayTabs');
 
   const visible = state.tasks.filter(t => taskVisible(t, d));
   const recurring = sortByPriority(visible.filter(t => t.repeat !== 'once'));
@@ -296,6 +435,16 @@ function render() {
     content.appendChild(sec);
   }
 }
+
+// set default time inputs to now / now+1h
+const nowDate = new Date();
+const hh = String(nowDate.getHours()).padStart(2,'0');
+const mm = String(nowDate.getMinutes()).padStart(2,'0');
+const endDate = new Date(nowDate.getTime() + 60*60*1000);
+const eh = String(endDate.getHours()).padStart(2,'0');
+const em = String(endDate.getMinutes()).padStart(2,'0');
+document.getElementById('logStart').value = `${hh}:${mm}`;
+document.getElementById('logEnd').value = `${eh}:${em}`;
 
 render();
 </script>
