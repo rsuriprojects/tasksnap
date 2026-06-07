@@ -570,6 +570,7 @@ function logout() {
   document.getElementById('mainApp').style.display = 'none';
   document.getElementById('pwScreen').style.display = 'flex';
   document.getElementById('pwInput').value = '';
+  document.getElementById('pwError').classList.add('hidden');
 }
 
 function closeAI() {
