@@ -446,19 +446,56 @@ function render() {
 }
 
 // ─── AI ASSISTANT ────────────────────────────────────────────
-const SYSTEM_PROMPT = `You are a personal AI assistant built into tasksnap, a task tracker app. You know this user well:
+const SYSTEM_PROMPT = `You are a personal AI assistant built into tasksnap, a task tracker app. Here's everything you know about the user:
 
-- They're a sophomore at Ladue High School in St. Louis, MO. Summer break is May 27 – Aug 24, 2026.
-- JPH Advanced Chemistry class: every Monday 6:30–9:00pm CST, with ~2–3hrs of homework due weekly (they try to do it Fridays).
-- ACT test date: July 11, 2026. Target score: 35+ composite. Previous scores: Math 35, Science 35, English 34, Reading 30. Reading is the weakest section and the main focus.
-- Saxophone: needs to practice minimum 18 days per month or their dad cancels lessons. Daily habit goal is 30–45 min.
-- LCSRC nonprofit org (laduestem.org): runs about half a day per week. Key summer events: Boeing STEAMfest booth June 20, FLL fundraiser camp July 28–Aug 1, Vitendo 4 Africa camp Aug 3–7.
-- Physical activity: basketball, tennis, or workouts. Tries to stay active.
-- Driver's license: goal to get it ASAP this summer.
-- Dad wants them to log time on a timesheet daily.
-- General summer structure: 4–5 structured hours/day. Mondays anchored by chem class.
+WHO THEY ARE: Sophomore at Ladue High School in the Ladue, Missouri area. Summer break May 27 – August 24, 2026. Junior year starts August 24.
 
-You help them plan their day, suggest tasks to add, remind them of upcoming deadlines, and give motivational nudges. Be friendly, concise, and personal — you already know them. Today is ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}.`;
+JPH ADVANCED CHEMISTRY: Every Monday 6:30–9:00pm CST. Weekly homework (~2–3 hours), can do it any day they're free.
+
+ACT: Main test date September 19, 2026 (July spots filled up). Previous scores (Sep 2025): Math 35, Science 35, English 34, Reading 30. Target: 35+ composite. Reading is the weakest section — need it at 35 or 36 to be on track.
+
+SAXOPHONE: Need minimum 18 days of practice per month or dad cancels lessons. Already done 2 days this month, 16 days left needed. Daily goal is 30–45 min.
+
+LCSRC NONPROFIT (laduestem.org): Runs about half a day per week. Key summer events: June 20 Boeing STEAMfest booth, June 22–26 FLL Fundraiser Camp ($250/student), July 28–Aug 1 FLL Fundraiser Camp ($250/student), Aug 3–7 Vitendo 4 Africa Camp (pure robotics, grades 3–8).
+
+KEY DATES: June 9 Chipotle interview 9am, June 22 driver's license road test 2pm, Aug 12–19 OUT OF TOWN, Aug 24 school starts.
+
+DAILY STUFF: Walk dog London, log timesheet, saxophone practice, ACT Reading prep, physical activity (basketball, tennis, workouts).
+
+Today is ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}.
+
+YOU CAN ACTUALLY ADD, COMPLETE, AND DELETE TASKS in the app. When the user asks you to add, complete/check off/mark done, or remove/delete tasks, you MUST include a JSON actions block at the END of your message in this exact format (no exceptions):
+
+\`\`\`actions
+[
+  {"action":"add","name":"play saxophone","tag":"personal","priority":"high","repeat":"daily"},
+  {"action":"complete","name":"play basketball"},
+  {"action":"delete","name":"some task"}
+]
+\`\`\`
+
+Rules: tag = work/personal/health. priority = high/medium/low. repeat = once/daily/weekdays/weekends. Always include the block when task changes are requested. Multiple actions allowed. Tell the user what you did in plain text ABOVE the block.`;
+
+function executeActions(actionsJson) {
+  let actions;
+  try { actions = JSON.parse(actionsJson); } catch(e) { return; }
+  const d = state.activeDay;
+  let changed = false;
+  actions.forEach(a => {
+    if (a.action === 'add') {
+      state.tasks.push({ id: state.nextId++, name: a.name, tag: a.tag||'personal', priority: a.priority||'medium', repeat: a.repeat||'once', day: d, done: {} });
+      changed = true;
+    } else if (a.action === 'complete') {
+      const match = state.tasks.find(t => t.name.toLowerCase().includes(a.name.toLowerCase()) || a.name.toLowerCase().includes(t.name.toLowerCase()));
+      if (match) { match.done[d] = true; changed = true; }
+    } else if (a.action === 'delete') {
+      const before = state.tasks.length;
+      state.tasks = state.tasks.filter(t => !t.name.toLowerCase().includes(a.name.toLowerCase()));
+      if (state.tasks.length !== before) changed = true;
+    }
+  });
+  if (changed) { save(); render(); }
+}
 
 function openAI() {
   document.getElementById('aiOverlay').classList.add('open');
@@ -544,10 +581,19 @@ async function sendAI() {
       })
     });
     const data = await res.json();
-    const reply = data.choices?.[0]?.message?.content || 'something went wrong, try again!';
+    const raw = data.choices?.[0]?.message?.content || 'something went wrong, try again!';
     typing.remove();
-    appendMsg('assistant', reply);
-    aiHistory.push({ role: 'assistant', content: reply });
+
+    // parse out any actions block
+    const actionsMatch = raw.match(/```actions\s*([\s\S]*?)```/);
+    const displayText = raw.replace(/```actions[\s\S]*?```/g, '').trim();
+
+    appendMsg('assistant', displayText || 'done!');
+    aiHistory.push({ role: 'assistant', content: raw });
+
+    if (actionsMatch) {
+      try { executeActions(actionsMatch[1].trim()); } catch(e) {}
+    }
   } catch (e) {
     typing.remove();
     appendMsg('assistant', 'network error — check your API key or connection.');
