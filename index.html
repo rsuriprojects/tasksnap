@@ -207,15 +207,8 @@
     <button class="ai-close" onclick="closeAI()">✕</button>
   </div>
 
-  <!-- key setup screen -->
-  <div id="keySetup" class="key-setup hidden">
-    <p>paste your <strong>OpenRouter API key</strong> to enable the AI assistant. it saves locally and is never shared.</p>
-    <input class="key-input" id="keyInput" placeholder="sk-or-..." type="password" />
-    <button class="key-save" onclick="saveKey()">save & continue</button>
-  </div>
-
   <!-- chat screen -->
-  <div id="chatScreen" class="hidden" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+  <div id="chatScreen" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
     <div class="ai-messages" id="aiMessages"></div>
     <div class="ai-input-row">
       <input class="ai-input" id="aiInput" placeholder="ask me anything…" />
@@ -500,29 +493,12 @@ function executeActions(actionsJson) {
 function openAI() {
   document.getElementById('aiOverlay').classList.add('open');
   document.getElementById('aiDrawer').classList.add('open');
-  const key = localStorage.getItem('tasksnap_or_key');
-  if (!key) {
-    document.getElementById('keySetup').classList.remove('hidden');
-    document.getElementById('chatScreen').style.display = 'none';
-  } else {
-    document.getElementById('keySetup').classList.add('hidden');
-    document.getElementById('chatScreen').style.display = 'flex';
-    if (aiHistory.length === 0) addWelcome();
-  }
+  if (aiHistory.length === 0) addWelcome();
 }
 
 function closeAI() {
   document.getElementById('aiOverlay').classList.remove('open');
   document.getElementById('aiDrawer').classList.remove('open');
-}
-
-function saveKey() {
-  const key = document.getElementById('keyInput').value.trim();
-  if (!key) return;
-  localStorage.setItem('tasksnap_or_key', key);
-  document.getElementById('keySetup').classList.add('hidden');
-  document.getElementById('chatScreen').style.display = 'flex';
-  addWelcome();
 }
 
 function addWelcome() {
@@ -544,9 +520,6 @@ async function sendAI() {
   const input = document.getElementById('aiInput');
   const text = input.value.trim();
   if (!text) return;
-  const key = localStorage.getItem('tasksnap_or_key');
-  if (!key) return;
-
   input.value = '';
   appendMsg('user', text);
   aiHistory.push({ role: 'user', content: text });
@@ -563,21 +536,14 @@ async function sendAI() {
   const taskContext = `\n\nCurrent day: ${DAYS[d]}. Tasks done today: ${doneTasks.length ? doneTasks.join(', ') : 'none'}. Tasks still pending: ${pendingTasks.length ? pendingTasks.join(', ') : 'none'}.`;
 
   try {
-    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const res = await fetch('/api/chat', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${key}`,
-        'HTTP-Referer': window.location.href,
-        'X-Title': 'tasksnap'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'anthropic/claude-sonnet-4-5',
         messages: [
           { role: 'system', content: SYSTEM_PROMPT + taskContext },
           ...aiHistory
-        ],
-        max_tokens: 500
+        ]
       })
     });
     const data = await res.json();
