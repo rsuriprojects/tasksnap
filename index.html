@@ -91,9 +91,9 @@
   .empty { text-align: center; padding: 2rem; color: var(--text2); font-size: 14px; }
 
   /* priority dot */
-  .priority-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-  .p-high   { background: #F0997B; }
-  .p-medium { background: #FAC775; }
+  .priority-dot { width: 9px; height: 9px; min-width: 9px; min-height: 9px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
+  .p-high   { background: #F0695E; }
+  .p-medium { background: #F5A623; }
   .p-low    { background: #B4B2A9; }
 
   /* time log entries */
@@ -175,9 +175,9 @@
       <option value="daily">every day</option>
     </select>
     <select class="add-select" id="prioritySelect">
-      <option value="medium">🟡 medium</option>
-      <option value="high">🟤 high</option>
-      <option value="low">⚪ low</option>
+      <option value="medium">● medium</option>
+      <option value="high">● high</option>
+      <option value="low">● low</option>
     </select>
     <button class="add-btn" id="addBtn">add</button>
   </div>
