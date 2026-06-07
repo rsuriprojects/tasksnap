@@ -92,9 +92,9 @@
 
   /* priority dot */
   .priority-dot { width: 9px; height: 9px; min-width: 9px; min-height: 9px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
-  .p-high   { background: #F0695E; }
-  .p-medium { background: #F5A623; }
-  .p-low    { background: #B4B2A9; }
+  .p-high   { background-color: #F0695E !important; }
+  .p-medium { background-color: #F5A623 !important; }
+  .p-low    { background-color: #B4B2A9 !important; }
 
   /* time log entries */
   .log-item { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 13px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
@@ -175,9 +175,9 @@
       <option value="daily">every day</option>
     </select>
     <select class="add-select" id="prioritySelect">
-      <option value="medium">● medium</option>
-      <option value="high">● high</option>
-      <option value="low">● low</option>
+      <option value="high">🔴 high</option>
+      <option value="medium">🟠 medium</option>
+      <option value="low">🟡 low</option>
     </select>
     <button class="add-btn" id="addBtn">add</button>
   </div>
@@ -311,14 +311,17 @@ function makeDayTabs(containerId) {
   });
 }
 
+const PRIORITY_EMOJI = { high: '🔴', medium: '🟠', low: '🟡' };
+
 function makeTaskEl(task) {
   const d = state.activeDay;
   const isDone = !!task.done[d];
   const priority = task.priority || 'medium';
+  const emoji = PRIORITY_EMOJI[priority] || '🟠';
   const el = document.createElement('div');
   el.className = 'task-item' + (isDone ? ' done' : '');
   el.innerHTML = `
-    <div class="priority-dot p-${priority}"></div>
+    <span style="font-size:10px;flex-shrink:0;">${emoji}</span>
     <div class="check"><svg class="check-icon" viewBox="0 0 12 12"><polyline points="1.5,6 4.5,9.5 10.5,2.5"/></svg></div>
     <span class="task-name">${task.name}</span>
     <span class="task-tag tag-${task.tag}">${task.tag}</span>
