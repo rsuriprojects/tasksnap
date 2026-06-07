@@ -8,19 +8,11 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --green: #1D9E75;
-    --green-dark: #0F6E56;
-    --green-light: #E1F5EE;
-    --bg: #f2f2f4;
-    --surface: #ffffff;
-    --surface2: #f7f7f9;
-    --text: #1a1a1a;
-    --text2: #6e6e73;
-    --border: rgba(0,0,0,0.08);
-    --border2: rgba(0,0,0,0.14);
-    --radius: 16px;
-    --radius-sm: 10px;
-    --radius-pill: 99px;
+    --green: #1D9E75; --green-dark: #0F6E56; --green-light: #E1F5EE;
+    --bg: #f2f2f4; --surface: #ffffff; --surface2: #f7f7f9;
+    --text: #1a1a1a; --text2: #6e6e73;
+    --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.14);
+    --radius: 16px; --radius-sm: 10px; --radius-pill: 99px;
     --font: 'DM Sans', -apple-system, sans-serif;
   }
   @media (prefers-color-scheme: dark) {
@@ -35,19 +27,18 @@
   body { font-family: var(--font); background: var(--bg); min-height: 100vh; display: flex; justify-content: center; }
   .phone { width: 100%; max-width: 430px; min-height: 100vh; background: var(--bg); padding-bottom: 140px; }
 
-  /* topbar */
   .topbar { background: var(--surface); border-bottom: 0.5px solid var(--border); padding: 56px 20px 0; position: sticky; top: 0; z-index: 10; }
   .topbar-inner { display: flex; align-items: flex-end; justify-content: space-between; padding-bottom: 10px; }
   .brand { font-size: 26px; font-weight: 600; color: var(--text); letter-spacing: -0.5px; }
   .brand span { color: var(--green); }
   .date-str { font-size: 13px; color: var(--text2); margin-top: 2px; }
+  .ai-btn { background: var(--green); border: none; border-radius: var(--radius-pill); padding: 8px 14px; color: white; font-family: var(--font); font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .ai-btn:active { opacity: 0.8; }
 
-  /* view tabs */
   .view-tabs { display: flex; border-top: 0.5px solid var(--border); }
   .view-tab { flex: 1; padding: 10px; font-family: var(--font); font-size: 13px; font-weight: 500; background: none; border: none; cursor: pointer; color: var(--text2); border-bottom: 2px solid transparent; transition: all 0.15s; }
   .view-tab.active { color: var(--green); border-bottom-color: var(--green); }
 
-  /* progress */
   .progress-wrap { padding: 14px 20px 0; }
   .progress-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
   .progress-count { font-size: 13px; color: var(--text2); }
@@ -55,7 +46,6 @@
   .bar-bg { height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
   .bar-fill { height: 5px; background: var(--green); border-radius: 99px; transition: width 0.35s ease; }
 
-  /* day tabs */
   .day-tabs-wrap { padding: 14px 20px 0; overflow-x: auto; scrollbar-width: none; }
   .day-tabs-wrap::-webkit-scrollbar { display: none; }
   .day-tabs { display: flex; gap: 6px; }
@@ -63,11 +53,9 @@
   .day-tab.active { background: var(--green); color: white; border-color: var(--green); font-weight: 500; }
   .day-tab.is-today:not(.active) { border-color: var(--green); color: var(--green); }
 
-  /* section */
   .section { padding: 20px 20px 0; }
   .section-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text2); margin-bottom: 10px; }
 
-  /* task cards */
   .task-item { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 13px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 8px; cursor: pointer; transition: background 0.12s; user-select: none; }
   .task-item:active { background: var(--surface2); transform: scale(0.99); }
   .task-item.done { opacity: 0.5; }
@@ -90,13 +78,6 @@
   .task-item:hover .task-delete { opacity: 1; }
   .empty { text-align: center; padding: 2rem; color: var(--text2); font-size: 14px; }
 
-  /* priority dot */
-  .priority-dot { width: 9px; height: 9px; min-width: 9px; min-height: 9px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
-  .p-high   { background-color: #F0695E !important; }
-  .p-medium { background-color: #F5A623 !important; }
-  .p-low    { background-color: #B4B2A9 !important; }
-
-  /* time log entries */
   .log-item { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 13px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
   .log-bar { width: 3px; border-radius: 99px; background: var(--green); align-self: stretch; flex-shrink: 0; }
   .log-body { flex: 1; }
@@ -106,11 +87,10 @@
   .log-delete { background: none; border: none; color: var(--text2); cursor: pointer; font-size: 16px; opacity: 0; transition: opacity 0.15s; padding: 2px; }
   .log-item:hover .log-delete { opacity: 1; }
 
-  /* add bar */
-  .add-wrap { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: var(--surface); border-top: 0.5px solid var(--border); padding: 12px 16px 28px; }
+  .add-wrap { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: var(--surface); border-top: 0.5px solid var(--border); padding: 12px 16px 28px; z-index: 20; }
   .add-input { width: 100%; font-family: var(--font); font-size: 15px; padding: 11px 14px; border-radius: var(--radius-sm); border: 0.5px solid var(--border2); background: var(--surface2); color: var(--text); outline: none; margin-bottom: 8px; }
   .add-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(29,158,117,0.12); }
-  .add-controls { display: flex; gap: 6px; flex-wrap: wrap; }
+  .add-controls { display: flex; gap: 6px; }
   .add-select { flex: 1; font-family: var(--font); font-size: 13px; padding: 8px 6px; border-radius: var(--radius-sm); border: 0.5px solid var(--border2); background: var(--surface2); color: var(--text); cursor: pointer; outline: none; min-width: 0; }
   .add-time { flex: 1; font-family: var(--font); font-size: 13px; padding: 8px 6px; border-radius: var(--radius-sm); border: 0.5px solid var(--border2); background: var(--surface2); color: var(--text); outline: none; min-width: 0; }
   .add-time:focus { border-color: var(--green); }
@@ -118,10 +98,35 @@
   .add-btn:hover { background: var(--green-dark); }
   .add-btn:active { transform: scale(0.97); }
 
-  /* all done banner */
   .all-done { background: var(--green-light); border: 0.5px solid rgba(29,158,117,0.25); border-radius: var(--radius); padding: 14px 16px; margin: 0 20px; display: flex; align-items: center; gap: 10px; }
   .all-done-text { font-size: 15px; font-weight: 500; color: var(--green-dark); }
   @media (prefers-color-scheme: dark) { .all-done-text { color: #4ECBA4; } }
+
+  /* AI drawer */
+  .ai-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 30; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+  .ai-overlay.open { opacity: 1; pointer-events: all; }
+  .ai-drawer { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%) translateY(100%); width: 100%; max-width: 430px; height: 75vh; background: var(--surface); border-radius: 20px 20px 0 0; z-index: 31; display: flex; flex-direction: column; transition: transform 0.3s cubic-bezier(0.32,0.72,0,1); }
+  .ai-drawer.open { transform: translateX(-50%) translateY(0); }
+  .ai-header { padding: 16px 20px 12px; border-bottom: 0.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .ai-title { font-size: 16px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .ai-close { background: none; border: none; font-size: 20px; color: var(--text2); cursor: pointer; padding: 2px; }
+  .ai-messages { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+  .ai-msg { max-width: 85%; padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.5; }
+  .ai-msg.user { background: var(--green); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+  .ai-msg.assistant { background: var(--surface2); color: var(--text); align-self: flex-start; border-bottom-left-radius: 4px; }
+  .ai-msg.typing { color: var(--text2); font-style: italic; }
+  .ai-input-row { padding: 12px 16px 28px; border-top: 0.5px solid var(--border); display: flex; gap: 8px; flex-shrink: 0; }
+  .ai-input { flex: 1; font-family: var(--font); font-size: 14px; padding: 10px 14px; border-radius: var(--radius-pill); border: 0.5px solid var(--border2); background: var(--surface2); color: var(--text); outline: none; }
+  .ai-input:focus { border-color: var(--green); }
+  .ai-send { background: var(--green); color: white; border: none; border-radius: 50%; width: 38px; height: 38px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .ai-send:disabled { opacity: 0.5; cursor: default; }
+
+  /* key setup */
+  .key-setup { padding: 24px 20px; text-align: center; }
+  .key-setup p { font-size: 14px; color: var(--text2); margin-bottom: 16px; line-height: 1.5; }
+  .key-input { width: 100%; font-family: var(--font); font-size: 14px; padding: 11px 14px; border-radius: var(--radius-sm); border: 0.5px solid var(--border2); background: var(--surface2); color: var(--text); outline: none; margin-bottom: 10px; }
+  .key-input:focus { border-color: var(--green); }
+  .key-save { width: 100%; background: var(--green); color: white; border: none; border-radius: var(--radius-sm); padding: 12px; font-family: var(--font); font-size: 15px; font-weight: 500; cursor: pointer; }
 
   .hidden { display: none; }
 </style>
@@ -134,6 +139,7 @@
         <div class="brand">task<span>snap</span></div>
         <div class="date-str" id="dateStr"></div>
       </div>
+      <button class="ai-btn" onclick="openAI()">✨ ask ai</button>
     </div>
     <div class="view-tabs">
       <button class="view-tab active" id="tabTasks" onclick="switchView('tasks')">tasks</button>
@@ -193,23 +199,46 @@
   </div>
 </div>
 
+<!-- AI drawer -->
+<div class="ai-overlay" id="aiOverlay" onclick="closeAI()"></div>
+<div class="ai-drawer" id="aiDrawer">
+  <div class="ai-header">
+    <div class="ai-title">✨ tasksnap ai</div>
+    <button class="ai-close" onclick="closeAI()">✕</button>
+  </div>
+
+  <!-- key setup screen -->
+  <div id="keySetup" class="key-setup hidden">
+    <p>paste your <strong>OpenRouter API key</strong> to enable the AI assistant. it saves locally and is never shared.</p>
+    <input class="key-input" id="keyInput" placeholder="sk-or-..." type="password" />
+    <button class="key-save" onclick="saveKey()">save & continue</button>
+  </div>
+
+  <!-- chat screen -->
+  <div id="chatScreen" class="hidden" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+    <div class="ai-messages" id="aiMessages"></div>
+    <div class="ai-input-row">
+      <input class="ai-input" id="aiInput" placeholder="ask me anything…" />
+      <button class="ai-send" id="aiSend" onclick="sendAI()">↑</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const jsDay = new Date().getDay();
 const todayIdx = jsDay === 0 ? 6 : jsDay - 1;
 const PRIORITY_ORDER = { high: 0, medium: 1, low: 2 };
+const PRIORITY_EMOJI = { high: '🔴', medium: '🟠', low: '🟡' };
 
 let state = JSON.parse(localStorage.getItem('tasksnap_state') || 'null') || {
-  activeDay: todayIdx,
-  tasks: [],
-  logs: [],
-  nextId: 1,
-  nextLogId: 1
+  activeDay: todayIdx, tasks: [], logs: [], nextId: 1, nextLogId: 1
 };
 if (!state.logs) state.logs = [];
 if (!state.nextLogId) state.nextLogId = 1;
 
 let currentView = 'tasks';
+let aiHistory = [];
 
 function save() { localStorage.setItem('tasksnap_state', JSON.stringify(state)); }
 
@@ -228,13 +257,11 @@ function toggleTask(id) {
   const t = state.tasks.find(t => t.id === id);
   if (t) { t.done[state.activeDay] = !t.done[state.activeDay]; save(); render(); }
 }
-
 function deleteTask(id, e) {
   e.stopPropagation();
   state.tasks = state.tasks.filter(t => t.id !== id);
   save(); render();
 }
-
 function deleteLog(id, e) {
   e.stopPropagation();
   state.logs = state.logs.filter(l => l.id !== id);
@@ -268,25 +295,21 @@ function addLog() {
 function formatTime(t) {
   const [h, m] = t.split(':').map(Number);
   const ampm = h >= 12 ? 'pm' : 'am';
-  const h12 = h % 12 || 12;
-  return `${h12}:${String(m).padStart(2,'0')}${ampm}`;
+  return `${h % 12 || 12}:${String(m).padStart(2,'0')}${ampm}`;
 }
-
 function calcDuration(start, end) {
   const [sh, sm] = start.split(':').map(Number);
   const [eh, em] = end.split(':').map(Number);
   let mins = (eh * 60 + em) - (sh * 60 + sm);
   if (mins <= 0) return null;
-  const h = Math.floor(mins / 60);
-  const m = mins % 60;
-  if (h === 0) return `${m}m`;
-  if (m === 0) return `${h}h`;
-  return `${h}h ${m}m`;
+  const h = Math.floor(mins / 60), m = mins % 60;
+  return h === 0 ? `${m}m` : m === 0 ? `${h}h` : `${h}h ${m}m`;
 }
 
 document.getElementById('addBtn').addEventListener('click', addTask);
 document.getElementById('addInput').addEventListener('keydown', e => { if (e.key === 'Enter') addTask(); });
 document.getElementById('addLogBtn').addEventListener('click', addLog);
+document.getElementById('aiInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendAI(); });
 
 function switchView(view) {
   currentView = view;
@@ -310,8 +333,6 @@ function makeDayTabs(containerId) {
     tabs.appendChild(btn);
   });
 }
-
-const PRIORITY_EMOJI = { high: '🔴', medium: '🟠', low: '🟡' };
 
 function makeTaskEl(task) {
   const d = state.activeDay;
@@ -342,16 +363,12 @@ function renderLog() {
   const dayLogs = state.logs.filter(l => l.day === d).sort((a, b) => a.start.localeCompare(b.start));
   const content = document.getElementById('logContent');
   content.innerHTML = '';
-
   if (!dayLogs.length) {
     const sec = document.createElement('div');
     sec.className = 'section';
     sec.innerHTML = `<div class="empty">no time logs for ${DAYS[d]}<br><span style="font-size:13px">add an activity below</span></div>`;
-    content.appendChild(sec);
-    return;
+    content.appendChild(sec); return;
   }
-
-  // total time
   let totalMins = 0;
   dayLogs.forEach(l => {
     const [sh, sm] = l.start.split(':').map(Number);
@@ -359,15 +376,12 @@ function renderLog() {
     const diff = (eh * 60 + em) - (sh * 60 + sm);
     if (diff > 0) totalMins += diff;
   });
-  const totalH = Math.floor(totalMins / 60);
-  const totalM = totalMins % 60;
-  const totalStr = totalH > 0 ? (totalM > 0 ? `${totalH}h ${totalM}m` : `${totalH}h`) : `${totalM}m`;
-
+  const th = Math.floor(totalMins / 60), tm = totalMins % 60;
+  const totalStr = th > 0 ? (tm > 0 ? `${th}h ${tm}m` : `${th}h`) : `${tm}m`;
   const header = document.createElement('div');
   header.className = 'section';
   header.innerHTML = `<div class="section-label">total logged: ${totalStr}</div>`;
   content.appendChild(header);
-
   const sec = document.createElement('div');
   sec.className = 'section';
   dayLogs.forEach(l => {
@@ -396,29 +410,23 @@ function render() {
   const jsTarget = d === 6 ? 0 : d + 1;
   showDate.setDate(now.getDate() + (jsTarget - now.getDay()));
   document.getElementById('dateStr').textContent = showDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-
   makeDayTabs('dayTabs');
-
   const visible = state.tasks.filter(t => taskVisible(t, d));
   const recurring = sortByPriority(visible.filter(t => t.repeat !== 'once'));
   const once = sortByPriority(visible.filter(t => t.repeat === 'once'));
   const doneCount = visible.filter(t => t.done[d]).length;
   const pct = visible.length ? Math.round(doneCount / visible.length * 100) : 0;
-
   document.getElementById('progressCount').textContent = `${doneCount} of ${visible.length} done`;
   document.getElementById('progressPct').textContent = pct + '%';
   document.getElementById('barFill').style.width = pct + '%';
-
   const content = document.getElementById('mainContent');
   content.innerHTML = '';
-
   if (visible.length > 0 && doneCount === visible.length) {
     const banner = document.createElement('div');
     banner.className = 'all-done';
     banner.innerHTML = `<span style="font-size:20px">🎉</span><span class="all-done-text">all done for ${DAYS[d]}!</span>`;
     content.appendChild(banner);
   }
-
   function renderSection(tasks, label) {
     if (!tasks.length) return;
     const sec = document.createElement('div');
@@ -427,10 +435,8 @@ function render() {
     tasks.forEach(t => sec.appendChild(makeTaskEl(t)));
     content.appendChild(sec);
   }
-
   renderSection(recurring, 'recurring');
   renderSection(once, 'today only');
-
   if (!visible.length) {
     const sec = document.createElement('div');
     sec.className = 'section';
@@ -439,15 +445,123 @@ function render() {
   }
 }
 
-// set default time inputs to now / now+1h
+// ─── AI ASSISTANT ────────────────────────────────────────────
+const SYSTEM_PROMPT = `You are a personal AI assistant built into tasksnap, a task tracker app. You know this user well:
+
+- They're a sophomore at Ladue High School in St. Louis, MO. Summer break is May 27 – Aug 24, 2026.
+- JPH Advanced Chemistry class: every Monday 6:30–9:00pm CST, with ~2–3hrs of homework due weekly (they try to do it Fridays).
+- ACT test date: July 11, 2026. Target score: 35+ composite. Previous scores: Math 35, Science 35, English 34, Reading 30. Reading is the weakest section and the main focus.
+- Saxophone: needs to practice minimum 18 days per month or their dad cancels lessons. Daily habit goal is 30–45 min.
+- LCSRC nonprofit org (laduestem.org): runs about half a day per week. Key summer events: Boeing STEAMfest booth June 20, FLL fundraiser camp July 28–Aug 1, Vitendo 4 Africa camp Aug 3–7.
+- Physical activity: basketball, tennis, or workouts. Tries to stay active.
+- Driver's license: goal to get it ASAP this summer.
+- Dad wants them to log time on a timesheet daily.
+- General summer structure: 4–5 structured hours/day. Mondays anchored by chem class.
+
+You help them plan their day, suggest tasks to add, remind them of upcoming deadlines, and give motivational nudges. Be friendly, concise, and personal — you already know them. Today is ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}.`;
+
+function openAI() {
+  document.getElementById('aiOverlay').classList.add('open');
+  document.getElementById('aiDrawer').classList.add('open');
+  const key = localStorage.getItem('tasksnap_or_key');
+  if (!key) {
+    document.getElementById('keySetup').classList.remove('hidden');
+    document.getElementById('chatScreen').style.display = 'none';
+  } else {
+    document.getElementById('keySetup').classList.add('hidden');
+    document.getElementById('chatScreen').style.display = 'flex';
+    if (aiHistory.length === 0) addWelcome();
+  }
+}
+
+function closeAI() {
+  document.getElementById('aiOverlay').classList.remove('open');
+  document.getElementById('aiDrawer').classList.remove('open');
+}
+
+function saveKey() {
+  const key = document.getElementById('keyInput').value.trim();
+  if (!key) return;
+  localStorage.setItem('tasksnap_or_key', key);
+  document.getElementById('keySetup').classList.add('hidden');
+  document.getElementById('chatScreen').style.display = 'flex';
+  addWelcome();
+}
+
+function addWelcome() {
+  const today = DAYS[state.activeDay];
+  appendMsg('assistant', `hey! 👋 today is ${today}. what do you need help with? i can suggest tasks, help you plan your day, or remind you what's coming up.`);
+}
+
+function appendMsg(role, text) {
+  const msgs = document.getElementById('aiMessages');
+  const div = document.createElement('div');
+  div.className = `ai-msg ${role}`;
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+async function sendAI() {
+  const input = document.getElementById('aiInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const key = localStorage.getItem('tasksnap_or_key');
+  if (!key) return;
+
+  input.value = '';
+  appendMsg('user', text);
+  aiHistory.push({ role: 'user', content: text });
+
+  const sendBtn = document.getElementById('aiSend');
+  sendBtn.disabled = true;
+  const typing = appendMsg('assistant typing', '...');
+
+  // build context about current tasks
+  const d = state.activeDay;
+  const todayTasks = state.tasks.filter(t => taskVisible(t, d));
+  const doneTasks = todayTasks.filter(t => t.done[d]).map(t => t.name);
+  const pendingTasks = todayTasks.filter(t => !t.done[d]).map(t => t.name);
+  const taskContext = `\n\nCurrent day: ${DAYS[d]}. Tasks done today: ${doneTasks.length ? doneTasks.join(', ') : 'none'}. Tasks still pending: ${pendingTasks.length ? pendingTasks.join(', ') : 'none'}.`;
+
+  try {
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${key}`,
+        'HTTP-Referer': window.location.href,
+        'X-Title': 'tasksnap'
+      },
+      body: JSON.stringify({
+        model: 'anthropic/claude-sonnet-4-5',
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT + taskContext },
+          ...aiHistory
+        ],
+        max_tokens: 500
+      })
+    });
+    const data = await res.json();
+    const reply = data.choices?.[0]?.message?.content || 'something went wrong, try again!';
+    typing.remove();
+    appendMsg('assistant', reply);
+    aiHistory.push({ role: 'assistant', content: reply });
+  } catch (e) {
+    typing.remove();
+    appendMsg('assistant', 'network error — check your API key or connection.');
+  }
+  sendBtn.disabled = false;
+  document.getElementById('aiInput').focus();
+}
+
 const nowDate = new Date();
 const hh = String(nowDate.getHours()).padStart(2,'0');
 const mm = String(nowDate.getMinutes()).padStart(2,'0');
 const endDate = new Date(nowDate.getTime() + 60*60*1000);
-const eh = String(endDate.getHours()).padStart(2,'0');
-const em = String(endDate.getMinutes()).padStart(2,'0');
 document.getElementById('logStart').value = `${hh}:${mm}`;
-document.getElementById('logEnd').value = `${eh}:${em}`;
+document.getElementById('logEnd').value = `${String(endDate.getHours()).padStart(2,'0')}:${String(endDate.getMinutes()).padStart(2,'0')}`;
 
 render();
 </script>
