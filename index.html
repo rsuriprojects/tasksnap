@@ -128,18 +128,39 @@
   .key-input:focus { border-color: var(--green); }
   .key-save { width: 100%; background: var(--green); color: white; border: none; border-radius: var(--radius-sm); padding: 12px; font-family: var(--font); font-size: 15px; font-weight: 500; cursor: pointer; }
 
+  /* password screen */
+  .pw-screen { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px; z-index: 100; }
+  .pw-brand { font-size: 28px; font-weight: 600; color: var(--text); letter-spacing: -0.5px; margin-bottom: 8px; }
+  .pw-brand span { color: var(--green); }
+  .pw-sub { font-size: 14px; color: var(--text2); margin-bottom: 32px; }
+  .pw-input { width: 100%; max-width: 300px; font-family: var(--font); font-size: 16px; padding: 13px 16px; border-radius: var(--radius-sm); border: 0.5px solid var(--border2); background: var(--surface); color: var(--text); outline: none; margin-bottom: 12px; text-align: center; letter-spacing: 0.1em; }
+  .pw-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(29,158,117,0.12); }
+  .pw-btn { width: 100%; max-width: 300px; background: var(--green); color: white; border: none; border-radius: var(--radius-sm); padding: 13px; font-family: var(--font); font-size: 15px; font-weight: 500; cursor: pointer; }
+  .pw-error { font-size: 13px; color: #E24B4A; margin-top: 8px; }
   .hidden { display: none; }
 </style>
 </head>
 <body>
-<div class="phone">
+<!-- password screen -->
+<div class="pw-screen" id="pwScreen">
+  <div class="pw-brand">task<span>snap</span></div>
+  <div class="pw-sub">enter your password to continue</div>
+  <input class="pw-input" id="pwInput" type="password" placeholder="password" />
+  <button class="pw-btn" onclick="checkPassword()">continue</button>
+  <div class="pw-error hidden" id="pwError">incorrect password</div>
+</div>
+
+<div class="phone" id="mainApp" style="display:none;">
   <div class="topbar">
     <div class="topbar-inner">
       <div>
         <div class="brand">task<span>snap</span></div>
         <div class="date-str" id="dateStr"></div>
       </div>
-      <button class="ai-btn" onclick="openAI()">✨ ask ai</button>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="ai-btn" onclick="openAI()">✨ ask ai</button>
+        <button onclick="logout()" style="background:none;border:none;color:var(--text2);font-size:13px;cursor:pointer;padding:4px;">out</button>
+      </div>
     </div>
     <div class="view-tabs">
       <button class="view-tab active" id="tabTasks" onclick="switchView('tasks')">tasks</button>
@@ -438,6 +459,51 @@ function render() {
   }
 }
 
+// ─── PASSWORD & CONTEXT ──────────────────────────────────────
+const ACTION_INSTRUCTIONS = "YOU CAN ADD, COMPLETE, AND DELETE TASKS. When the user asks you to add, complete/mark done, or remove tasks, include a JSON actions block at the END of your message exactly like this:\n~~~actions\n[{\"action\":\"add\",\"name\":\"task name\",\"tag\":\"personal\",\"priority\":\"medium\",\"repeat\":\"once\"}]\n~~~\n\nRules: tag = work/personal/health. priority = high/medium/low. repeat = once/daily/weekdays/weekends. Tell the user what you did ABOVE the block.";
+
+const PROFILES = {
+  'rishi': {
+    name: 'Rishi',
+    systemPrompt: "You are a personal AI assistant built into tasksnap. Here is everything you know about the user:\n\nWHO THEY ARE: Sophomore at Ladue High School in the Ladue, Missouri area. Summer break May 27 - August 24, 2026. Junior year starts August 24.\n\nJPH ADVANCED CHEMISTRY: Every Monday 6:30-9:00pm CST. Weekly homework (~2-3 hours), can do it any day they're free.\n\nACT: Main test date September 19, 2026 (July spots filled up). Previous scores (Sep 2025): Math 35, Science 35, English 34, Reading 30. Target: 35+ composite. Reading is the weakest section - need it at 35 or 36 to be on track.\n\nSAXOPHONE: Need minimum 18 days of practice per month or dad cancels lessons. Already done 2 days this month, 16 days left needed. Daily goal is 30-45 min.\n\nLCSRC NONPROFIT (laduestem.org): Runs about half a day per week. Key summer events: June 20 Boeing STEAMfest booth, June 22-26 FLL Fundraiser Camp ($250/student), July 28-Aug 1 FLL Fundraiser Camp ($250/student), Aug 3-7 Vitendo 4 Africa Camp (pure robotics, grades 3-8).\n\nKEY DATES: June 9 Chipotle interview 9am, June 22 driver's license road test 2pm, Aug 12-19 OUT OF TOWN, Aug 24 school starts.\n\nDAILY STUFF: Walk dog London, log timesheet, saxophone practice, ACT Reading prep, physical activity (basketball, tennis, workouts).\n\n" + ACTION_INSTRUCTIONS
+  },
+  'mom': {
+    name: 'Mom',
+    systemPrompt: "You are a helpful personal AI assistant built into tasksnap, a task tracker app. Help the user plan their day, manage tasks, and stay organized. Be friendly and concise.\n\n" + ACTION_INSTRUCTIONS
+  },
+  'dad': {
+    name: 'Dad',
+    systemPrompt: "You are a helpful personal AI assistant built into tasksnap, a task tracker app. Help the user plan their day, manage tasks, and stay organized. Be friendly and concise.\n\n" + ACTION_INSTRUCTIONS
+  }
+};
+
+let currentProfile = null;
+
+function checkPassword() {
+  const pw = document.getElementById('pwInput').value.trim().toLowerCase();
+  const profile = PROFILES[pw];
+  if (!profile) {
+    document.getElementById('pwError').classList.remove('hidden');
+    document.getElementById('pwInput').value = '';
+    return;
+  }
+  currentProfile = profile;
+  localStorage.setItem('tasksnap_pw', pw);
+  document.getElementById('pwScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'block';
+  render();
+}
+
+document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') checkPassword(); });
+
+// auto-login if password saved
+const savedPw = localStorage.getItem('tasksnap_pw');
+if (savedPw && PROFILES[savedPw]) {
+  currentProfile = PROFILES[savedPw];
+  document.getElementById('pwScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'block';
+}
+
 // ─── AI ASSISTANT ────────────────────────────────────────────
 const SYSTEM_PROMPT = `You are a personal AI assistant built into tasksnap, a task tracker app. Here's everything you know about the user:
 
@@ -459,13 +525,13 @@ Today is ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'lon
 
 YOU CAN ACTUALLY ADD, COMPLETE, AND DELETE TASKS in the app. When the user asks you to add, complete/check off/mark done, or remove/delete tasks, you MUST include a JSON actions block at the END of your message in this exact format (no exceptions):
 
-\`\`\`actions
+~~~actions
 [
   {"action":"add","name":"play saxophone","tag":"personal","priority":"high","repeat":"daily"},
   {"action":"complete","name":"play basketball"},
   {"action":"delete","name":"some task"}
 ]
-\`\`\`
+~~~
 
 Rules: tag = work/personal/health. priority = high/medium/low. repeat = once/daily/weekdays/weekends. Always include the block when task changes are requested. Multiple actions allowed. Tell the user what you did in plain text ABOVE the block.`;
 
@@ -496,6 +562,16 @@ function openAI() {
   if (aiHistory.length === 0) addWelcome();
 }
 
+function logout() {
+  localStorage.removeItem('tasksnap_pw');
+  currentProfile = null;
+  aiHistory = [];
+  document.getElementById('aiMessages').innerHTML = '';
+  document.getElementById('mainApp').style.display = 'none';
+  document.getElementById('pwScreen').style.display = 'flex';
+  document.getElementById('pwInput').value = '';
+}
+
 function closeAI() {
   document.getElementById('aiOverlay').classList.remove('open');
   document.getElementById('aiDrawer').classList.remove('open');
@@ -503,7 +579,8 @@ function closeAI() {
 
 function addWelcome() {
   const today = DAYS[state.activeDay];
-  appendMsg('assistant', `hey! 👋 today is ${today}. what do you need help with? i can suggest tasks, help you plan your day, or remind you what's coming up.`);
+  const name = currentProfile ? currentProfile.name : 'there';
+  appendMsg('assistant', `hey ${name}! 👋 today is ${today}. what do you need help with? i can suggest tasks, help you plan your day, or remind you what's coming up.`);
 }
 
 function appendMsg(role, text) {
@@ -541,7 +618,7 @@ async function sendAI() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         messages: [
-          { role: 'system', content: SYSTEM_PROMPT + taskContext },
+          { role: 'system', content: (currentProfile ? currentProfile.systemPrompt : SYSTEM_PROMPT) + taskContext },
           ...aiHistory
         ]
       })
@@ -551,8 +628,8 @@ async function sendAI() {
     typing.remove();
 
     // parse out any actions block
-    const actionsMatch = raw.match(/```actions\s*([\s\S]*?)```/);
-    const displayText = raw.replace(/```actions[\s\S]*?```/g, '').trim();
+    const actionsMatch = raw.match(/~~~actions\s*([\s\S]*?)~~~/);
+    const displayText = raw.replace(/~~~actions[\s\S]*?~~~/g, '').trim();
 
     appendMsg('assistant', displayText || 'done!');
     aiHistory.push({ role: 'assistant', content: raw });
