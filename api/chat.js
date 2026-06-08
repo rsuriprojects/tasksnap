@@ -19,7 +19,7 @@ export default async function handler(req, res) {
         'X-Title': 'tasksnap'
       },
       body: JSON.stringify({
-        model: 'anthropic/claude-sonnet-4-5',
+        model: 'anthropic/claude-sonnet-4-6',
         messages,
         max_tokens: 500
       })
